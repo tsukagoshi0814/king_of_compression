@@ -1,9 +1,9 @@
 #define _CRT_SECURE_NO_WARNINGS
 
 #include <stdio.h>
+#include <string>
 #include <string.h>
 #include <vector>
-#include "BS.h"
 
 char fileName[256];		//デフォルトファイルネーム
 char fileExtension[256];	//デフォルトの拡張子
@@ -30,6 +30,8 @@ struct LZ78
 	unsigned char data;
 };
 
+void BlockSort_COMP(STR* orgData, STR* outData, unsigned int *index);
+void BlockSort_DEV(STR* orgData, STR* outData, unsigned int *index);
 void RLE_COMP(STR* orgData, STR* outData);
 void RLE_DEV(STR* orgData, STR* outData);
 void LZ78_COMP(STR* orgData, STR* outData);
@@ -104,10 +106,11 @@ void Compression()
 	strcpy(compFileName, fileName);
 	strcat(compFileName, ".cmp");
 
-	std::string orgStr((char*)org.data,org.len);
-	std::string BSdata;
-	int index;
 
+	//ブロックソート
+	STR BSdata;
+	unsigned int index;
+	BlockSort_COMP(&org, &BSdata, &index);
 
 
 	//RLE圧縮
@@ -143,6 +146,33 @@ void Develop()
 	fp = fopen(devFileName, "wb");
 	fwrite(RLEdata.data, RLEdata.len, 1, fp);
 	fclose(fp);
+
+}
+
+void BlockSort_COMP(STR* orgData, STR* outData, unsigned int *index)
+{
+	unsigned char* buff;
+	buff = new unsigned char[orgData->len*2];
+	for (int i = 0; i < orgData->len; i++)
+	{
+		buff[i] = orgData->data[i];
+		buff[orgData->len + i] = orgData->data[i];
+	}
+
+	std::string *BSdata;
+	BSdata = new std::string[orgData->len];
+
+	for (int i = 0; i < orgData->len; i++)
+	{
+		BSdata[i].copy((char*)buff, i, orgData->len);
+	}
+
+	int hoge;
+	hoge = 0;
+
+}
+void BlockSort_DEV(STR* orgData, STR* outData, unsigned int *index)
+{
 
 }
 
@@ -238,7 +268,7 @@ void LZ78_COMP(STR* orgData, STR* outData)
 	stertDic.length = 0;
 	dic.push_back(stertDic);
 
-	int LZcur = 0;
+	unsigned int LZcur = 0;
 	while (LZcur < orgData->len)
 	{
 		for (int i = dic.size() - 1; i >= 0; i--)
@@ -266,7 +296,7 @@ void LZ78_COMP(STR* orgData, STR* outData)
 	//文字列に出力
 	outData->len = 0;
 	outData->data = new unsigned char[LZdata.size() * 3];
-	for (int i = 0; i < LZdata.size(); i++)
+	for (unsigned int i = 0; i < LZdata.size(); i++)
 	{
 		//インデックスのshort型をchar型に変換する
 		unsigned char top = LZdata.at(i).index>>8;
@@ -295,7 +325,7 @@ void LZ78_DEV(STR* orgData, STR* outData)
 	stertDic.length = 0;
 	dic.push_back(stertDic);
 
-	for (int i = 0; i < orgData->len; i += 3)
+	for (unsigned int i = 0; i < orgData->len; i += 3)
 	{
 		unsigned short index = orgData->data[i] << 8 | orgData->data[i + 1];
 		

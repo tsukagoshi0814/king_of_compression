@@ -18,11 +18,5 @@
     <ClCompile Include="main.cpp">
       <Filter>ソース ファイル</Filter>
     </ClCompile>
-    <ClCompile Include="BS.h">
-      <Filter>ヘッダー ファイル</Filter>
-    </ClCompile>
-    <ClCompile Include="BS.cpp">
-      <Filter>ソース ファイル</Filter>
-    </ClCompile>
   </ItemGroup>
 </Project>
